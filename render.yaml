@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://render.com/schema/render.yaml.json
+#
+# AnythingLLM on Render — one-click gallery template
+# Repo: https://github.com/render-examples/anything-llm-render-template
+# Upstream: https://github.com/Mintplex-Labs/anything-llm
+# Image: https://hub.docker.com/r/mintplexlabs/anythingllm (tag: render)
+#
+# Pattern: image-wrapper (official Mintplex :render image).
+# Mirrors upstream branch `render` Blueprint: SQLite + documents/models on a disk.
+# LLM provider keys are configured in the AnythingLLM UI after first login.
+
+previews:
+  generation: off
+
+projects:
+  - name: anything-llm-render-template
+    environments:
+      - name: production
+        services:
+          - type: web
+            name: anythingllm
+            runtime: image
+            plan: standard
+            region: oregon
+            image:
+              url: docker.io/mintplexlabs/anythingllm:render-1.15.0
+            healthCheckPath: /api/ping
+            autoDeployTrigger: off
+            disk:
+              name: anythingllm-storage
+              mountPath: /storage
+              sizeGB: 10
+            envVars:
+              - key: PORT
+                value: "3001"
+              - key: STORAGE_DIR
+                value: "/storage"
+              - key: JWT_SECRET
+                generateValue: true
+              - key: SIG_KEY
+                generateValue: true
+              - key: SIG_SALT
+                generateValue: true
+              # Optional: multi-user password gate. Set after first admin signup
+              # if you want an instance-wide password (see AnythingLLM docs).
+              - key: AUTH_TOKEN
+                sync: false
